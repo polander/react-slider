@@ -1,6 +1,9 @@
 {
-  "name": "test-react",
-  "version": "0.1.0",
+  "name": "react-slider",
+  "version": "1.0.0",
+  "author": "Dmitrijs Tarasovs",
+  "description": "React Slider (Slideshow) for any HTML content",
+  "keywords": ["react", "app", "slider"],
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
