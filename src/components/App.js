@@ -67,7 +67,10 @@ class App extends React.Component {
                 .then(function(data) {
                     self.setState({
                         content: data.map(el => (
-                                <img src={el.urls.regular} alt={el.alt_description}></img>)),
+                                <img 
+                                    className="no-select no-eve"
+                                    src={el.urls.regular} 
+                                    alt={el.alt_description}></img>)),
                         loadState: self.LOAD_STATE.LOADED
                     });
                 })
@@ -83,7 +86,7 @@ class App extends React.Component {
                 .then(function(data) {
                     self.setState({
                         content: data.slice(0, self.slideCount).map(el => (
-                                <p>{el.text}</p>)),
+                                <p className="no-select no-eve">{el.text}</p>)),
                         loadState: self.LOAD_STATE.LOADED
                     });
                 })
@@ -93,7 +96,7 @@ class App extends React.Component {
                 break;
             default:
                 let customContent = [
-                    <h1>First Slide</h1>,
+                    <h1 className="no-select no-eve">First Slide</h1>,
                     <p>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
                         sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
@@ -101,18 +104,21 @@ class App extends React.Component {
                         nisi ut aliquip ex ea commodo consequat.
                     </p>,
                     <img 
+                        className="no-select no-eve"
                         src="https://cache.desktopnexus.com/thumbseg/919/919386-bigthumbnail.jpg"
                         alt="Nature">
                     </img>,
                     <img 
+                        className="no-select no-eve"
                         src='https://static.scientificamerican.com/sciam/cache/file/4E0744CD-793A-4EF8-B550B54F7F2C4406_source.jpg'
                         alt="Nature">
                     </img>,
                     <img 
+                        className="no-select no-eve"
                         src='https://www.sampleposts.com/wp-content/uploads/2020/04/Nature-climate.jpg'
                         alt="Nature">
                     </img>,
-                    <video width='640' height='480' controls>
+                    <video className="no-select no-eve" width='640' height='480' controls>
                         <source src='https://www.videvo.net/videvo_files/converted/2013_07/videos/hd0079.mov26726.mp4'
                                 type='video/mp4'/>
                         Your browser does not support the video.
