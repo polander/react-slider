@@ -3,15 +3,32 @@ import React from "react";
 import Slide from './Slide';
 import Controls from './Controls';
 import SlideList from './SlideList';
+import Settings from './Settings';
 
 import '../styles/App.css';
 
 class App extends React.Component {
     constructor(props) {
         super(props);
+
+        this.LOAD_STATE = {
+            LOADING: 0,
+            LOADED: 1,
+            ERROR: 2
+        };
+        this.CONTENT_TYPE = {
+            CUSTOM: -1,
+            IMAGES: 0,
+            TEXT: 1
+        };
+
         this.state = {
             currentSlide: 0,
-            offsetX: 0
+            offsetX: 0,
+            content: [],
+            contentType: this.CONTENT_TYPE.CUSTOM,
+            loadState: this.LOAD_STATE.LOADING,
+            multiMode: false
         };
 
         this.mouseDown = false;
@@ -25,34 +42,101 @@ class App extends React.Component {
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.swipeDirection = this.swipeDirection.bind(this);
         this.goToSlide = this.goToSlide.bind(this);
+        this.fetchContent = this.fetchContent.bind(this);
+        this.setContentType = this.setContentType.bind(this);
+        this.toggleMultiMode = this.toggleMultiMode.bind(this);
 
-        this.htmlContent = [
-            <h1>First Slide</h1>,
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
-                nisi ut aliquip ex ea commodo consequat.
-            </p>,
-            <img 
-                src="https://cache.desktopnexus.com/thumbseg/919/919386-bigthumbnail.jpg"
-                alt="Nature">
-            </img>,
-            <img 
-                src='https://static.scientificamerican.com/sciam/cache/file/4E0744CD-793A-4EF8-B550B54F7F2C4406_source.jpg'
-                alt="Nature">
-            </img>,
-            <img 
-                src='https://www.sampleposts.com/wp-content/uploads/2020/04/Nature-climate.jpg'
-                alt="Nature">
-            </img>,
-            <video width='640' height='480' controls>
-                <source src='https://www.videvo.net/videvo_files/converted/2013_07/videos/hd0079.mov26726.mp4'
-                        type='video/mp4'/>
-                Your browser does not support the video.
-            </video>
-        ];
-        this.slideCount = this.htmlContent.length;
+        this.slideCount = 6;
+    }
+    componentDidMount() {
+        this.fetchContent(this.state.contentType);
+    }
+    fetchContent(type) {
+        this.setState({loadState: this.LOAD_STATE.LOADING});
+
+        let self = this;
+
+        switch(type) {
+            case this.CONTENT_TYPE.IMAGES:
+                fetch("https://api.unsplash.com/photos/random/?count="
+                        +self.slideCount+
+                        "&client_id=wVTdRoReBseX_BHaV8X2LQzoNDDlhzxnFKWem52g_JY")
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    self.setState({
+                        content: data.map(el => (
+                                <img src={el.urls.regular} alt={el.alt_description}></img>)),
+                        loadState: self.LOAD_STATE.LOADED
+                    });
+                })
+                .catch(() => {
+                    self.setState({loadState: self.LOAD_STATE.ERROR});
+                });
+                break;
+            case this.CONTENT_TYPE.TEXT:
+                fetch("https://type.fit/api/quotes")
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    self.setState({
+                        content: data.slice(0, self.slideCount).map(el => (
+                                <p>{el.text}</p>)),
+                        loadState: self.LOAD_STATE.LOADED
+                    });
+                })
+                .catch(() => {
+                    self.setState({loadState: self.LOAD_STATE.ERROR});
+                });
+                break;
+            default:
+                let customContent = [
+                    <h1>First Slide</h1>,
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
+                        nisi ut aliquip ex ea commodo consequat.
+                    </p>,
+                    <img 
+                        src="https://cache.desktopnexus.com/thumbseg/919/919386-bigthumbnail.jpg"
+                        alt="Nature">
+                    </img>,
+                    <img 
+                        src='https://static.scientificamerican.com/sciam/cache/file/4E0744CD-793A-4EF8-B550B54F7F2C4406_source.jpg'
+                        alt="Nature">
+                    </img>,
+                    <img 
+                        src='https://www.sampleposts.com/wp-content/uploads/2020/04/Nature-climate.jpg'
+                        alt="Nature">
+                    </img>,
+                    <video width='640' height='480' controls>
+                        <source src='https://www.videvo.net/videvo_files/converted/2013_07/videos/hd0079.mov26726.mp4'
+                                type='video/mp4'/>
+                        Your browser does not support the video.
+                    </video>
+                ];
+                if(customContent.length < this.slideCount) {
+                    customContent = customContent
+                                    .concat(Array(this.slideCount-customContent.length)
+                                    .fill(<h2>No content</h2>));
+                }
+                this.setState({
+                    content: customContent.slice(0, this.slideCount),
+                    loadState: self.LOAD_STATE.LOADED
+                });
+                break;
+        }
+    }
+    setContentType(type) {
+        this.setState({contentType: type});
+        this.fetchContent(type);
+        this.goToSlide(0);
+    }
+    toggleMultiMode() {
+        this.setState({multiMode: !this.state.multiMode})
     }
     prevSlide() {
         if(this.state.currentSlide <= 0) {
@@ -118,17 +202,27 @@ class App extends React.Component {
                 onMouseUp={mouseUpEvent => this.handleMouseUp(mouseUpEvent)}>
 
                 <Slide
-                    content={this.htmlContent} 
+                    content={this.state.content} 
                     curr={this.state.currentSlide}
                     offset={this.state.offsetX}
-                    slideCount={this.slideCount}/>
+                    slideCount={this.slideCount}
+                    multi={this.state.multiMode}
+                    status={this.state.loadState}
+                    LOAD_STATE={this.LOAD_STATE}/>
                 <Controls 
                     prevSlide={this.prevSlide} 
                     nextSlide={this.nextSlide}/>
                 <SlideList 
                     goto={this.goToSlide} 
                     curr={this.state.currentSlide}
-                    slideCount={this.slideCount}/>
+                    slideCount={this.slideCount}
+                    multi={this.state.multiMode}/>
+                <Settings
+                    multi={this.state.multiMode}
+                    toggleMulti={this.toggleMultiMode}
+                    setType={this.setContentType}
+                    contentType={this.state.contentType}
+                    CONTENT_TYPE={this.CONTENT_TYPE}/>    
             </div>
         );
     }

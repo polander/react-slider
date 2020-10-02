@@ -1,19 +1,23 @@
+* {
+  box-sizing: border-box;
+}
 html, body {
-  width: 100%;
   height: 100%;
-  margin: 0;
-  padding: 0;
   overflow: hidden;
+  background: rgb(40,60,82);
 }
 body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   display: flex;
-  background: rgb(40,60,82);
   background: radial-gradient(circle, rgba(40,60,82,1) 0%, rgba(22,26,33,1) 100%);
 }
 .app-container {
   position: relative;
-  width: 100%;
-  padding-top: 56.25%;
+  width: 90%;
+  height: 70%;
   margin: auto;
   align-self: center;
 
@@ -23,6 +27,7 @@ body {
 }
 @media (min-width: 560px) {
   .app-container {
+      height: initial;
       width: 80%;
       padding-top: 45%;
   }

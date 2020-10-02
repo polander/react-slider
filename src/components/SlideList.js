@@ -1,6 +1,9 @@
 import React from 'react';
 
 const SlideList = (props) => {
+    if(props.multi) {
+        return true;
+    }
     let list = Array.from(Array(props.slideCount).keys())
                     .map(el => (
                         (props.curr === el)
